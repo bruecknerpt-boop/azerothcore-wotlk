@@ -8877,7 +8877,7 @@ bool Spell::HasGlobalCooldown() const
 
 void Spell::TriggerGlobalCooldown()
 {
-    int32 gcd = m_spellInfo->StartRecoveryTime;
+    uint32 gcd = uint32(m_spellInfo->StartRecoveryTime);
     if (!gcd)
     {
         // Xinef: fix for charmed pet spells with no cooldown info
@@ -8900,11 +8900,22 @@ void Spell::TriggerGlobalCooldown()
         if (m_caster->IsPlayer())
             m_caster->ToPlayer()->ApplySpellMod(m_spellInfo->Id, SPELLMOD_GLOBAL_COOLDOWN, gcd, this);
 
-        // Apply haste rating
-        if (m_spellInfo->StartRecoveryCategory == 133 && m_spellInfo->StartRecoveryTime == 1500 && m_spellInfo->DmgClass != SPELL_DAMAGE_CLASS_MELEE &&
-            m_spellInfo->DmgClass != SPELL_DAMAGE_CLASS_RANGED && !m_spellInfo->HasAttribute(SPELL_ATTR0_USES_RANGED_SLOT) && !m_spellInfo->HasAttribute(SPELL_ATTR0_IS_ABILITY))
+        if (m_caster->IsPlayer())
         {
-            gcd = int32(float(gcd) * m_caster->GetFloatValue(UNIT_MOD_CAST_SPEED));
+            Player* player = m_caster->ToPlayer();
+            sScriptMgr->OnPlayerCalculateGlobalCooldown(player, m_spellInfo, gcd);
+        }
+        else
+        {
+            // Vanilla fallback for non-player casters
+            if (m_spellInfo->StartRecoveryCategory == 133 && m_spellInfo->StartRecoveryTime == 1500 &&
+                m_spellInfo->DmgClass != SPELL_DAMAGE_CLASS_MELEE &&
+                m_spellInfo->DmgClass != SPELL_DAMAGE_CLASS_RANGED &&
+                !m_spellInfo->HasAttribute(SPELL_ATTR0_USES_RANGED_SLOT) &&
+                !m_spellInfo->HasAttribute(SPELL_ATTR0_IS_ABILITY))
+            {
+                gcd = uint32(float(gcd) * m_caster->GetFloatValue(UNIT_MOD_CAST_SPEED));
+            }
         }
 
         if (gcd < MIN_GCD)

@@ -322,3 +322,40 @@ void ScriptMgr::FillSpellSummary()
         }
     }
 }
+
+bool ScriptMgr::OnBeforeCalcSpellMissResult(Unit* attacker, Unit* victim, SpellInfo const* spellInfo, SpellMissInfo& missInfo)
+{
+    if (ScriptRegistry<UnitScript>::EnabledHooks[UNITHOOK_ON_BEFORE_CALC_SPELL_MISS_RESULT].empty())
+        return false;
+
+    for (UnitScript* script : ScriptRegistry<UnitScript>::EnabledHooks[UNITHOOK_ON_BEFORE_CALC_SPELL_MISS_RESULT])
+    {
+        if (script->OnBeforeCalcSpellMissResult(attacker, victim, spellInfo, missInfo))
+            return true;
+    }
+
+    return false;
+}
+
+bool ScriptMgr::OnBeforeCalcPhysicalMissChance(Unit const* attacker, Unit const* victim, WeaponAttackType attType, float& missChance)
+{
+    if (ScriptRegistry<UnitScript>::EnabledHooks[UNITHOOK_ON_BEFORE_CALC_PHYSICAL_MISS_CHANCE].empty())
+        return false;
+
+    for (UnitScript* script : ScriptRegistry<UnitScript>::EnabledHooks[UNITHOOK_ON_BEFORE_CALC_PHYSICAL_MISS_CHANCE])
+    {
+        if (script->OnBeforeCalcPhysicalMissChance(attacker, victim, attType, missChance))
+            return true;
+    }
+
+    return false;
+}
+
+void ScriptMgr::OnPlayerCalculateGlobalCooldown(Player* player, SpellInfo const* spellInfo, uint32& gcdMs)
+{
+    for (auto const& [scriptID, script] : ScriptRegistry<PlayerScript>::ScriptPointerList)
+    {
+        if (script)
+            script->OnPlayerCalculateGlobalCooldown(player, spellInfo, gcdMs);
+    }
+}

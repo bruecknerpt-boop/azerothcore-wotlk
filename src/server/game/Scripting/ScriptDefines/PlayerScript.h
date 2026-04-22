@@ -61,6 +61,7 @@ enum PlayerHook
     PLAYERHOOK_ON_EMOTE,
     PLAYERHOOK_ON_TEXT_EMOTE,
     PLAYERHOOK_ON_SPELL_CAST,
+    PLAYERHOOK_ON_CALCULATE_GLOBAL_COOLDOWN,
     PLAYERHOOK_ON_LOAD_FROM_DB,
     PLAYERHOOK_ON_LOGIN,
     PLAYERHOOK_ON_BEFORE_LOGOUT,
@@ -315,6 +316,7 @@ public:
 
     // Called in Spell::Cast.
     virtual void OnPlayerSpellCast(Player* /*player*/, Spell* /*spell*/, bool /*skipCheck*/) { }
+    virtual void OnPlayerCalculateGlobalCooldown(Player* /*player*/, SpellInfo const* /*spellInfo*/, uint32& /*gcdMs*/) { }
 
     // Called during data loading
     virtual void OnPlayerLoadFromDB(Player* /*player*/) { };

@@ -2947,7 +2947,7 @@ MeleeHitOutcome Unit::RollMeleeOutcomeAgainst(Unit const* victim, WeaponAttackTy
     // Miss chance based on melee
     //float miss_chance = MeleeMissChanceCalc(victim, attType);
     float miss_chance = MeleeSpellMissChance(victim, attType, int32(GetWeaponSkillValue(attType, victim)) - int32(victim->GetMaxSkillValueForLevel(this)), 0);
-
+    
     // Critical hit chance
     float crit_chance = GetUnitCriticalChance(attType, victim);
     if (crit_chance < 0)
@@ -3572,7 +3572,14 @@ SpellMissInfo Unit::MagicSpellHitResult(Unit* victim, SpellInfo const* spellInfo
     int32 rand = irand(1, 10000); // Needs to be  1 to 10000 to avoid the 1/10000 chance to miss on 100% hit rating
 
     if (rand < tmp)
+    {
+        SpellMissInfo missInfo = SPELL_MISS_MISS;
+
+        if (sScriptMgr->OnBeforeCalcSpellMissResult(this, victim, spellInfo, missInfo))
+            return missInfo;
+
         return SPELL_MISS_MISS;
+    }
 
     // Chance resist mechanic (select max value from every mechanic spell effect)
     int32 resist_chance = victim->GetMechanicResistChance(spellInfo) * 100;
@@ -15261,6 +15268,10 @@ float Unit::MeleeSpellMissChance(Unit const* victim, WeaponAttackType attType, i
         return 0.0f;
     if (missChance > 60.0f)
         return 60.0f;
+    float overriddenMissChance = missChance;
+    if (sScriptMgr->OnBeforeCalcPhysicalMissChance(this, victim, attType, overriddenMissChance))
+        missChance = overriddenMissChance;
+
     return missChance;
 }
 

@@ -325,6 +325,7 @@ public: /* PlayerScript */
     void OnPlayerEmote(Player* player, uint32 emote);
     void OnPlayerTextEmote(Player* player, uint32 textEmote, uint32 emoteNum, ObjectGuid guid);
     void OnPlayerSpellCast(Player* player, Spell* spell, bool skipCheck);
+    void OnPlayerCalculateGlobalCooldown(Player* player, SpellInfo const* spellInfo, uint32& gcdMs);
     void OnPlayerLogin(Player* player);
     void OnPlayerLoadFromDB(Player* player);
     void OnPlayerBeforeLogout(Player* player);
@@ -549,6 +550,8 @@ public: /* UnitScript */
     void ModifyHealReceived(Unit* target, Unit* healer, uint32& addHealth, SpellInfo const* spellInfo);
     uint32 DealDamage(Unit* AttackerUnit, Unit* pVictim, uint32 damage, DamageEffectType damagetype);
     void OnBeforeRollMeleeOutcomeAgainst(Unit const* attacker, Unit const* victim, WeaponAttackType attType, int32& attackerMaxSkillValueForLevel, int32& victimMaxSkillValueForLevel, int32& attackerWeaponSkill, int32& victimDefenseSkill, int32& crit_chance, int32& miss_chance, int32& dodge_chance, int32& parry_chance, int32& block_chance);
+    bool OnBeforeCalcPhysicalMissChance(Unit const* attacker, Unit const* victim, WeaponAttackType attType, float& missChance);
+    bool OnBeforeCalcSpellMissResult(Unit* attacker, Unit* victim, SpellInfo const* spellInfo, SpellMissInfo& missInfo);
     void OnAuraApply(Unit* /*unit*/, Aura* /*aura*/);
     void OnAuraRemove(Unit* unit, AuraApplication* aurApp, AuraRemoveMode mode);
     bool IfNormalReaction(Unit const* unit, Unit const* target, ReputationRank& repRank);
